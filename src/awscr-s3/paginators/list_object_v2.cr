@@ -17,7 +17,7 @@ module Awscr::S3::Paginator
       return stop if (lo = @last_output) && !lo.truncated?
 
       if lo = @last_output
-        @params["continuation-token"] = lo.next_token
+        @params["marker"] = lo.next_token
       end
 
       @last_output = Response::ListObjectsV2.from_response(next_response)

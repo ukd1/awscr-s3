@@ -10,10 +10,10 @@ module Awscr::S3::Response
 
       name = xml.string("//ListBucketResult/Name")
       prefix = xml.string("//ListBucketResult/Prefix")
-      key_count = xml.string("//ListBucketResult/KeyCount")
+      key_count = 0
       max_keys = xml.string("//ListBucketResult/MaxKeys")
       truncated = xml.string("//ListBucketResult/IsTruncated")
-      token = xml.string("//ListBucketResult/NextContinuationToken")
+      token = xml.string("//ListBucketResult/NextMarker")
 
       objects = [] of Object
       xml.array("ListBucketResult/Contents") do |object|
