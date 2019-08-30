@@ -239,10 +239,38 @@ module Awscr::S3
     # resp = client.get_object("bucket1", "obj")
     # p resp.body # => "MY DATA"
     # ```
-    def get_object(bucket, object : String)
-      resp = http.get("/#{bucket}/#{object}")
+    def get_object(bucket, object : String, headers : Hash(String, String) = Hash(String, String).new)
+      resp = http.get("/#{bucket}/#{object}", headers: headers)
 
       Response::GetObjectOutput.from_response(resp)
+    end
+
+    # Get the contents of an object in a bucket as an IO object
+    #
+    # ```
+    # client = Client.new("region", "key", "secret")
+    # client.get_object("bucket1", "obj") do |resp|
+    #   IO.copy(resp.body.as(IO), STDOUT) # => "MY DATA"
+    # end
+    # ```
+    def get_object(bucket, object : String, headers : Hash(String, String) = Hash(String, String).new)
+      http.get("/#{bucket}/#{object}", headers: headers) do |resp|
+        yield Response::GetObjectOutput.from_response(resp)
+      end
+    end
+
+    # Get the metadata of an object in a bucket
+    #
+    # ```
+    # client = Client.new("region", "key", "secret")
+    # resp = client.head_object("bucket1", "obj")
+    # p resp.size          # => 123
+    # p resp.status        # => HTTP::Status::OK
+    # p resp.last_modified # => "Wed, 19 Jun 2019 11:55:33 GMT"
+    # ```
+    def head_object(bucket, object : String, headers : Hash(String, String) = Hash(String, String).new)
+      resp = http.head("/#{bucket}/#{object}", headers: headers)
+      Response::HeadObjectOutput.from_response(resp)
     end
 
     # List all the items in a bucket

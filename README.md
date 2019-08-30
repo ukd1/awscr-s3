@@ -64,7 +64,7 @@ resp # => true
 
 ```crystal
 client = Client.new("region", "key", "secret")
-resp = client.create_bucket("test")
+resp = client.put_bucket("test")
 resp # => true
 ```
 
@@ -107,7 +107,7 @@ resp.success? # => true
 ## **Get Object**
 
 ```crystal
-resp = client.put_object("bucket_name", "object_key")
+resp = client.get_object("bucket_name", "object_key")
 resp.body # => myobjectbody
 ```
 
@@ -143,7 +143,7 @@ end
 
 ```crystal
 form = Awscr::S3::Presigned::Form.build("us-east-1", "access key", "secret key") do |form|
-  form.expiration(Time.epoch(Time.now.epoch + 1000))
+  form.expiration(Time.unix(Time.now.to_unix + 1000))
   form.condition("bucket", "mybucket")
   form.condition("acl", "public-read")
   form.condition("key", SecureRandom.uuid)
