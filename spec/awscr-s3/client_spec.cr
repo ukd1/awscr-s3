@@ -1,8 +1,8 @@
 require "../spec_helper"
 
 module Awscr::S3
-  TEST_TIME_1 = Time.new(2009, 9, 11, 17, 50, 30, location: Time::Location::UTC)
-  TEST_TIME_2 = Time.new(2010, 10, 12, 17, 50, 30, location: Time::Location::UTC)
+  TEST_TIME_1 = Time.utc(2009, 9, 11, 17, 50, 30)
+  TEST_TIME_2 = Time.utc(2010, 10, 12, 17, 50, 30)
 
   describe Client do
     it "allows signer version" do
@@ -59,11 +59,11 @@ module Awscr::S3
       end
 
       it "raises if too many keys" do
-        keys = ["test"] * 1000
+        keys = ["test"] * 1001
 
         client = Client.new("us-east-1", "key", "secret")
 
-        expect_raises Exception do
+        expect_raises S3::Exception do
           client.batch_delete("bucket", keys)
         end
       end

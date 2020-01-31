@@ -33,6 +33,7 @@ module Awscr::S3
         aws_access_key: @aws_access_key,
         aws_secret_key: @aws_secret_key
       )
+      @http = Http.new(@signer, @region, @endpoint)
     end
 
     # List s3 buckets
@@ -194,7 +195,7 @@ module Awscr::S3
     # p resp.success? # => true
     # ```
     def batch_delete(bucket, keys : Array(String))
-      raise "More than 1000 keys is not yet supported." if keys.size > 1_000
+      raise S3::Exception.new("More than 1000 keys is not yet supported.") if keys.size > 1_000
 
       body = ::XML.build do |xml|
         xml.element("Delete") do
@@ -250,12 +251,12 @@ module Awscr::S3
     # ```
     # client = Client.new("region", "key", "secret")
     # client.get_object("bucket1", "obj") do |resp|
-    #   IO.copy(resp.body.as(IO), STDOUT) # => "MY DATA"
+    #   IO.copy(resp.body_io, STDOUT) # => "MY DATA"
     # end
     # ```
     def get_object(bucket, object : String, headers : Hash(String, String) = Hash(String, String).new)
       http.get("/#{bucket}/#{object}", headers: headers) do |resp|
-        yield Response::GetObjectOutput.from_response(resp)
+        yield Response::GetObjectStream.from_response(resp)
       end
     end
 
@@ -293,7 +294,7 @@ module Awscr::S3
 
     # :nodoc:
     private def http
-      Http.new(@signer, @region, @endpoint)
+      @http
     end
   end
 end

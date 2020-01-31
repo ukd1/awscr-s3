@@ -18,7 +18,7 @@ module Awscr
 
         # Create a Presigned::Url link. Supports GET and PUT.
         def for(method : Symbol)
-          raise "unsupported method #{method}" unless allowed_methods.includes?(method)
+          raise S3::Exception.new("unsupported method #{method}") unless allowed_methods.includes?(method)
 
           request = build_request(method.to_s.upcase)
 
@@ -56,7 +56,7 @@ module Awscr
           if @options.signer_version == :v4
             request.query_params.add("X-Amz-Expires", @options.expires.to_s)
           else
-            request.query_params.add("Expires", (Time.utc_now.to_unix + @options.expires).to_s)
+            request.query_params.add("Expires", (Time.utc.to_unix + @options.expires).to_s)
           end
 
           request
